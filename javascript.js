@@ -69,17 +69,17 @@ function handleOperator(operatorFunction) {
 
 function evaluate(nextOperator) {
   //do the evaluation and set x to answer
-  let x = arrayToNumber(xArray);
-  let y = arrayToNumber(yArray);
-  doOperation(x,y,operator);
+  let x = parseInt(xArray.join(""));
+  let y = parseInt(yArray.join(""));
+  let result = operator(x,y);
+  result = String(result).split("")
+  updateDisplay(result);
   // if nextOperator !== null the set operator to it
 }
 
-function doOperation(x,y,operations)
-
-function arrayToNumber(array) {
-
-}
+/* function arrayToNumber(array) {
+  return parseInt(array.join(""));
+} */
 
 function updateNumberArray(keyText, thisNumberArray, name) {
   console.log(`${keyText} key pressed on: ${name}` )
@@ -99,11 +99,11 @@ function updateNumberArray(keyText, thisNumberArray, name) {
   }
 
   if (keyText === "±" && dirty) {
-    if (thisNumberArray[0] === "−") {
+    if (thisNumberArray[0] === "-") {
       thisNumberArray.shift();
       updateDisplay(thisNumberArray);
     } else {
-      thisNumberArray.unshift("−");
+      thisNumberArray.unshift("-");
       updateDisplay(thisNumberArray);
     }
   } 
