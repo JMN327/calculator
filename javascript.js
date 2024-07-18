@@ -8,8 +8,12 @@ const buttons = document.querySelector(".buttons");
 initialize();
 updateDisplay(["0"])
 
-buttons.addEventListener('click', (event) => {
-  let keyText = event.target.innerText;
+document.addEventListener('keydown', (event) => handleInput(event.key, event.preventDefault()));
+
+buttons.addEventListener('click', (event) => handleInput(event.target.innerText));
+
+function handleInput(keyText){
+  console.log(keyText)
   switch (keyText) {
     case "0":
     case "1":
@@ -24,6 +28,8 @@ buttons.addEventListener('click', (event) => {
     case "↰":
     case ".":
     case "±":
+    case "F9":
+    case "Backspace":
       if (!dirty) {
         initialize();
       }
@@ -32,24 +38,30 @@ buttons.addEventListener('click', (event) => {
     case "+":
       handleOperator(add)
       break;
+    case "-":
     case "−":
       handleOperator(subtract)
       break;
+    case "*":
     case "×":
       handleOperator(multiply)
       break;
+    case "/":
     case "÷":
       handleOperator(divide)
       break;
+    case "Enter":
     case "=":
       evaluate(null);
       break;
+    case "Escape":
+    case "Delete":
     case "C":
       initialize()
       updateDisplay(["0"])
       break;
   }
-})
+}
 
 function initialize(){
   xArray.length = 0; //resets x array
@@ -108,7 +120,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
     updateDisplay(thisNumberArray, true);
   }
 
-  if (keyText === "±") {
+  if (keyText === "±" || keyText === "F9") {
     if(thisNumberArray.length !== 0) { //check wasn't pressed after operator
       if (thisNumberArray[0] === "-") {
         thisNumberArray.shift();
@@ -121,7 +133,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
 
   } 
 
-  if (keyText === "↰" && dirty) {
+  if ((keyText === "↰" || keyText === "Backspace") && dirty) {
     if (operator !== null && yArray.length === 0) {
       return;
     }
