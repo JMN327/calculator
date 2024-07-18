@@ -81,6 +81,10 @@ function initialize(){
 }
 
 function handleOperator(operatorFunction) {
+  if (!dirty) {
+    yArray.length = 0;
+    operator = null;
+  }
   if (xArray.length === 0) {
     xArray.push("0")
   }
@@ -113,8 +117,6 @@ function evaluate(nextOperator) {
   xArray = result;
   if (nextOperator === null) {
     dirty = false;
-    yArray.length = 0;
-    operator = null;
   } else {
     operator = nextOperator;
     yArray.length = 0;
