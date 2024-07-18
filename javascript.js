@@ -7,10 +7,10 @@ let precision = 11; //limit on digits that can be displayed
 const display = document.querySelector(".display-contents");
 const buttons = document.querySelector(".buttons");
 const eDisplay = document.querySelector(".e");
-const operatorDisplay = document.querySelector(".operator")
+const operatorDisplay = document.querySelector(".operator");
 
 initialize(); // set initial values
-updateDisplay(["0"]) //set display to begin
+updateDisplay(["0"]); //set display to begin
 
 //check for keyboard
 document.addEventListener('keydown', (event) => handleInput(event.key, event.preventDefault()));
@@ -19,7 +19,6 @@ buttons.addEventListener('click', (event) => handleInput(event.target.innerText)
 
 // handle both event listeners
 function handleInput(keyText){
-  console.log(keyText)
   switch (keyText) {
     case "0":
     case "1":
@@ -36,30 +35,33 @@ function handleInput(keyText){
     case "±":
     case "F9":
     case "Backspace":
+      if (!dirty) {
+        initialize();
+      }
       operator === null ? updateNumberArray(keyText, xArray, "x") : updateNumberArray(keyText, yArray, "y") 
       break;
     case "+":
-      operatorDisplay.innerText = "+"
-      handleOperator(add)
+      operatorDisplay.innerText = "+";
+      handleOperator(add);
       break;
     case "-":
     case "−":
-      operatorDisplay.innerText = "−"
-      handleOperator(subtract)
+      operatorDisplay.innerText = "−";
+      handleOperator(subtract);
       break;
     case "*":
     case "×":
-      operatorDisplay.innerText = "×"
-      handleOperator(multiply)
+      operatorDisplay.innerText = "×";
+      handleOperator(multiply);
       break;
     case "/":
     case "÷":
-      operatorDisplay.innerText = "÷"
-      handleOperator(divide)
+      operatorDisplay.innerText = "÷";
+      handleOperator(divide);
       break;
     case "Enter":
     case "=":
-      operatorDisplay.innerText = ""
+      operatorDisplay.innerText = "";
       // no operator passed to evaluation (null) so no operator chaining
       evaluate(null); 
       break;
@@ -91,7 +93,7 @@ function handleOperator(nextOperator) {
   }
   //handle operating on initial zero value
   if (xArray.length === 0) {
-    xArray.push("0")
+    xArray.push("0");
   }
 
   if (operator === null || yArray.length === 0) {
@@ -116,7 +118,7 @@ function evaluate(nextOperator) {
   //operates on numbers and rounds to significant figures but strips zeros
   let result = parseFloat(operator(x,y).toPrecision(precision + 1)); 
   // turn result back to array for displaying
-  result = String(result).split("")
+  result = String(result).split("");
   // check for numbers larger than display and show 'e' display to alert user
   if (result.length > precision) {
     eDisplay.innerText = "e";
@@ -138,7 +140,6 @@ function evaluate(nextOperator) {
 
 // handle numerical key downs
 function updateNumberArray(keyText, thisNumberArray, name) {
-  console.log(`${keyText} key pressed on: ${name}` )
 
   // process number keys
   if (!isNaN(keyText)) {
@@ -151,7 +152,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
   }
   // handle decimal places
   if (keyText === "." && !thisNumberArray.includes(".")) {
-    operatorDisplay.innerText = ""
+    operatorDisplay.innerText = "";
     //handle operating on initial zero value
     if (thisNumberArray.length === 0) {
       thisNumberArray.push("0");
@@ -163,7 +164,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
   // handle negation
   if (keyText === "±" || keyText === "F9") {
     if(thisNumberArray.length !== 0) { 
-      operatorDisplay.innerText = ""
+      operatorDisplay.innerText = "";
       if (thisNumberArray[0] === "-") {
         thisNumberArray.shift();
         updateDisplay(thisNumberArray);
@@ -182,7 +183,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
     }
     thisNumberArray.pop();
     if (thisNumberArray.length === 0) {
-      thisNumberArray.push("0")
+      thisNumberArray.push("0");
       dirty = false;
     }
     updateDisplay(thisNumberArray);
@@ -191,7 +192,6 @@ function updateNumberArray(keyText, thisNumberArray, name) {
 
 function updateDisplay(thisNumberArray, isDirty) {
   let str = thisNumberArray.slice(0, precision).join("");
-  console.log("string:" + str);
   display.innerText = str;
   dirty = isDirty ?? dirty;
 }
