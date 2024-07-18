@@ -6,6 +6,7 @@ const display = document.querySelector(".display");
 const buttons = document.querySelector(".buttons");
 
 initialize();
+updateDisplay(xArray)
 
 buttons.addEventListener('click', (event) => {
   let keyText = event.target.innerText;
@@ -42,6 +43,7 @@ buttons.addEventListener('click', (event) => {
       break;
     case "C":
       initialize()
+      updateDisplay(xArray)
       break;
   }
 })
@@ -52,7 +54,6 @@ function initialize(){
   yArray.length = 0;  //resets the y array
   operator = null;
   dirty = false;
-  updateDisplay(xArray, dirty);
 }
 
 function handleOperator(operatorFunction) {
@@ -68,18 +69,15 @@ function handleOperator(operatorFunction) {
 }
 
 function evaluate(nextOperator) {
-  //do the evaluation and set x to answer
-  let x = parseInt(xArray.join(""));
-  let y = parseInt(yArray.join(""));
+  let x = parseFloat(xArray.join(""));
+  let y = parseFloat(yArray.join(""));
   let result = operator(x,y);
   result = String(result).split("")
   updateDisplay(result);
-  // if nextOperator !== null the set operator to it
+  initialize()
+  xArray = result;
+  operator = nextOperator ??= null;
 }
-
-/* function arrayToNumber(array) {
-  return parseInt(array.join(""));
-} */
 
 function updateNumberArray(keyText, thisNumberArray, name) {
   console.log(`${keyText} key pressed on: ${name}` )
@@ -87,7 +85,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
   // process number keys
   if (!isNaN(keyText)) {
     if (!dirty) {
-      thisNumberArray.pop();
+      thisNumberArray.length = 0;
     }
     thisNumberArray.push(keyText);
     updateDisplay(thisNumberArray, true);
