@@ -58,7 +58,6 @@ function handleInput(keyText){
       break;
     case "Enter":
     case "=":
-      operatorDisplay.innerText = "";
       // no operator passed to evaluation (null) so no operator chaining
       evaluate(null); 
       break;
@@ -109,6 +108,7 @@ function evaluate(nextOperator) {
   if (operator === null || yArray.length === 0) {
     return;
   }
+  operatorDisplay.innerText = "";
   // begin evaluation by turning arrays to numbers
   let x = parseFloat(xArray.join(""));
   let y = parseFloat(yArray.join(""));
@@ -136,7 +136,7 @@ function evaluate(nextOperator) {
 }
 
 // handle numerical key downs
-function updateNumberArray(keyText, thisNumberArray, name) {
+function updateNumberArray(keyText, thisNumberArray) {
 
   // process number keys
   if (!isNaN(keyText)) {
@@ -165,7 +165,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
   }
 
   // handle negation
-  if ((keyText === "±" || keyText === "F9")&& dirty) {
+  if ((keyText === "±" || keyText === "F9") && dirty) {
     if(thisNumberArray.length !== 0) { 
       operatorDisplay.innerText = "";
       if (thisNumberArray[0] === "-") {
