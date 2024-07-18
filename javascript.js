@@ -35,9 +35,6 @@ function handleInput(keyText){
     case "±":
     case "F9":
     case "Backspace":
-      if (!dirty) {
-        initialize();
-      }
       operator === null ? updateNumberArray(keyText, xArray, "x") : updateNumberArray(keyText, yArray, "y") 
       break;
     case "+":
@@ -143,6 +140,9 @@ function updateNumberArray(keyText, thisNumberArray, name) {
 
   // process number keys
   if (!isNaN(keyText)) {
+    if (!dirty) {
+      initialize();
+    }
     operatorDisplay.innerText = "";
     if(thisNumberArray.length < precision){
       thisNumberArray.push(keyText);
@@ -152,6 +152,9 @@ function updateNumberArray(keyText, thisNumberArray, name) {
   }
   // handle decimal places
   if (keyText === "." && !thisNumberArray.includes(".")) {
+    if (!dirty) {
+      initialize();
+    }
     operatorDisplay.innerText = "";
     //handle operating on initial zero value
     if (thisNumberArray.length === 0) {
@@ -162,7 +165,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
   }
 
   // handle negation
-  if (keyText === "±" || keyText === "F9") {
+  if ((keyText === "±" || keyText === "F9")&& dirty) {
     if(thisNumberArray.length !== 0) { 
       operatorDisplay.innerText = "";
       if (thisNumberArray[0] === "-") {
