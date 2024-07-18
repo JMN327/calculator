@@ -1,20 +1,23 @@
-let xArray = [];
-let yArray = [];
-let operator;
-let dirty;
-let precision = 11;
+let xArray = []; //store digits of first operand
+let yArray = []; //store digits of second operand
+let operator; //store the operator as a function
+let dirty; // boolean check state for resets
+let precision = 11; //limit on digits that can be displayed
+
 const display = document.querySelector(".display-contents");
 const buttons = document.querySelector(".buttons");
 const eDisplay = document.querySelector(".e");
 const operatorDisplay = document.querySelector(".operator")
 
-initialize();
-updateDisplay(["0"])
+initialize(); // set initial values
+updateDisplay(["0"]) //set display to begin
 
+//check for keyboard
 document.addEventListener('keydown', (event) => handleInput(event.key, event.preventDefault()));
-
+// check for buttons
 buttons.addEventListener('click', (event) => handleInput(event.target.innerText));
 
+// handle both event listeners
 function handleInput(keyText){
   console.log(keyText)
   switch (keyText) {
@@ -33,9 +36,6 @@ function handleInput(keyText){
     case "±":
     case "F9":
     case "Backspace":
-      if (!dirty) {
-        initialize();
-      }
       operator === null ? updateNumberArray(keyText, xArray, "x") : updateNumberArray(keyText, yArray, "y") 
       break;
     case "+":
@@ -60,11 +60,13 @@ function handleInput(keyText){
     case "Enter":
     case "=":
       operatorDisplay.innerText = ""
-      evaluate(null);
+      // no operator passed to evaluation (null) so no operator chaining
+      evaluate(null); 
       break;
     case "Escape":
     case "Delete":
     case "C":
+      //resets all
       operatorDisplay.innerText = ""
       initialize()
       updateDisplay(["0"])
@@ -80,51 +82,61 @@ function initialize(){
   eDisplay.innerText = "";
 }
 
-function handleOperator(operatorFunction) {
+function handleOperator(nextOperator) {
+  // if no operator chaining then makes sure operator and y are reset 
+  // (x not reset so that evaluation results can be used)
   if (!dirty) {
     yArray.length = 0;
     operator = null;
   }
+  //handle operating on initial zero value
   if (xArray.length === 0) {
     xArray.push("0")
   }
+
   if (operator === null || yArray.length === 0) {
-    //normal setting operator or changing of operator if y value is still empty
-    operator = operatorFunction;
+    //no operator chaining: setting operator or changing 
+    // operator if y value is still empty i.e. operator mis-click
+    operator = nextOperator;
     dirty = true;
   } else {
-    //if operator already exists and y has value, evaluates the function (same as
-    // pressing equals key) and passes new operator to be worked on the evaluation
-    // so that operations can be chained quickly
-    evaluate(operatorFunction);
+    // operator chaining - next operator passed for evaluation to handle
+    evaluate(nextOperator);
   }
 }
 
 function evaluate(nextOperator) {
+  // check for early = key presses and exit if found
   if (operator === null || yArray.length === 0) {
     return;
   }
+  // begin evaluation by turning arrays to numbers
   let x = parseFloat(xArray.join(""));
   let y = parseFloat(yArray.join(""));
-  let result = parseFloat(operator(x,y).toPrecision(precision + 1)); //rounds to significant figures but strips zeros
+  //operates on numbers and rounds to significant figures but strips zeros
+  let result = parseFloat(operator(x,y).toPrecision(precision + 1)); 
+  // turn result back to array for displaying
   result = String(result).split("")
+  // check for numbers larger than display and show 'e' display to alert user
   if (result.length > precision) {
     eDisplay.innerText = "e";
   } else {
     eDisplay.innerText = "";
   }
+  // show result
   updateDisplay(result);
+  // set x so that evaluation results can be operated on
   xArray = result;
+  // handle operator chaining
   if (nextOperator === null) {
     dirty = false;
   } else {
     operator = nextOperator;
     yArray.length = 0;
   }
-  
-  
 }
 
+// handle numerical key downs
 function updateNumberArray(keyText, thisNumberArray, name) {
   console.log(`${keyText} key pressed on: ${name}` )
 
@@ -137,9 +149,10 @@ function updateNumberArray(keyText, thisNumberArray, name) {
     }
 
   }
-
+  // handle decimal places
   if (keyText === "." && !thisNumberArray.includes(".")) {
     operatorDisplay.innerText = ""
+    //handle operating on initial zero value
     if (thisNumberArray.length === 0) {
       thisNumberArray.push("0");
     }
@@ -147,8 +160,9 @@ function updateNumberArray(keyText, thisNumberArray, name) {
     updateDisplay(thisNumberArray, true);
   }
 
+  // handle negation
   if (keyText === "±" || keyText === "F9") {
-    if(thisNumberArray.length !== 0) { //check wasn't pressed after operator
+    if(thisNumberArray.length !== 0) { 
       operatorDisplay.innerText = ""
       if (thisNumberArray[0] === "-") {
         thisNumberArray.shift();
@@ -161,6 +175,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
 
   } 
 
+  // handle backspace
   if ((keyText === "↰" || keyText === "Backspace") && dirty) {
     if (operator !== null && yArray.length === 0) {
       return;
@@ -196,8 +211,3 @@ function multiply(x,y) {
 function divide(x,y) {
       return (x / y);
   };
-
-function round(x, decimalPlaces){
-    let shifter = 10 ** decimalPlaces;
-    return Math.round(x * shifter)/shifter;
-}
