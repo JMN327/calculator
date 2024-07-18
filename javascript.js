@@ -1,7 +1,7 @@
 let xArray = [];
 let yArray = [];
 let operator = null;
-
+const display = document.querySelector(".display")
 const buttons = document.querySelector(".buttons")
 
 buttons.addEventListener('click', (event) => {
@@ -20,7 +20,7 @@ buttons.addEventListener('click', (event) => {
     case "↰":
     case ".":
     case "±":
-      operator === null ? updateNumberArray(keyText, "x") : updateNumberArray(keyText, "y") 
+      operator === null ? updateNumberArray(keyText, xArray, "x") : updateNumberArray(keyText, yArray, "y") 
       break;
     case "+":
       handleOperator(add)
@@ -38,9 +38,7 @@ buttons.addEventListener('click', (event) => {
       evaluate(null);
       break;
     case "C":
-      console.log("clear key");
-      break;
-    default:
+      clearAll()
       break;
   }
 })
@@ -49,7 +47,7 @@ function handleOperator(operatorFunction) {
   if (operator === null || yArray.length === 0) {
     operator = operatorFunction;
   } else {
-    evaluate(operatorFunction)
+    evaluate(operatorFunction);
   }
 }
 
@@ -58,16 +56,32 @@ function evaluate(nextOperator) {
   // if nextOperator !== null the set operator to it
 }
 
-function updateNumberArray(keyText, number) {
-  console.log(`Adding ${keyText} to number Array ${number}`)
+function updateNumberArray(keyText, thisNumberArray, name) {
+  console.log(`Adding ${keyText} to ${name}` )
+  if (keyText === "±") {
+    if (thisNumberArray[0] === "−") {
+      thisNumberArray.shift();
+    } else {
+      thisNumberArray.unshift("−");
+    }
+  } else {
+    thisNumberArray.push(keyText);
+  }
+  
+  let str = thisNumberArray.join("")
+  updateDisplay(str);
 }
 
-function operate(x,y,operation){
-    return operation(x,y);
+function clearAll() {
+  xArray = [];
+  updateNumberArray("0", "x")
+  yArray = [];
+  operator = null;
 }
 
-//test:
-//console.log(round(operate(x,y,operator),1));
+function updateDisplay(str) {
+  display.innerText = str
+}
 
 function add(x,y) {
     return x + y;
