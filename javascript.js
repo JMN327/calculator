@@ -6,7 +6,7 @@ const display = document.querySelector(".display");
 const buttons = document.querySelector(".buttons");
 
 initialize();
-updateDisplay(xArray)
+updateDisplay(["0"])
 
 buttons.addEventListener('click', (event) => {
   let keyText = event.target.innerText;
@@ -24,6 +24,9 @@ buttons.addEventListener('click', (event) => {
     case "↰":
     case ".":
     case "±":
+      if (!dirty) {
+        initialize();
+      }
       operator === null ? updateNumberArray(keyText, xArray, "x") : updateNumberArray(keyText, yArray, "y") 
       break;
     case "+":
@@ -43,23 +46,30 @@ buttons.addEventListener('click', (event) => {
       break;
     case "C":
       initialize()
-      updateDisplay(xArray)
+      updateDisplay(["0"])
       break;
   }
 })
 
 function initialize(){
   xArray.length = 0; //resets x array
-  xArray[0] = "0";
   yArray.length = 0;  //resets the y array
   operator = null;
   dirty = false;
 }
 
 function handleOperator(operatorFunction) {
+  if (!dirty) {
+    yArray.length = 0;
+    operator = null;
+  }
+  if (xArray.length === 0) {
+    xArray.push("0")
+  }
   if (operator === null || yArray.length === 0) {
     //normal setting operator or changing of operator if y value is still empty
     operator = operatorFunction;
+    dirty = true;
   } else {
     //if operator already exists and y has value, evaluates the function (same as
     // pressing equals key) and passes new operator to be worked on the evaluation
@@ -69,14 +79,16 @@ function handleOperator(operatorFunction) {
 }
 
 function evaluate(nextOperator) {
+  if (operator === null || yArray.length === 0) {
+    return;
+  }
   let x = parseFloat(xArray.join(""));
   let y = parseFloat(yArray.join(""));
-  let result = operator(x,y);
+  let result = parseFloat(operator(x,y).toPrecision(11)); //rounds to significant figures but strips zeros
   result = String(result).split("")
   updateDisplay(result);
-  initialize()
   xArray = result;
-  operator = nextOperator ??= null;
+  dirty = false;
 }
 
 function updateNumberArray(keyText, thisNumberArray, name) {
@@ -84,29 +96,35 @@ function updateNumberArray(keyText, thisNumberArray, name) {
 
   // process number keys
   if (!isNaN(keyText)) {
-    if (!dirty) {
-      thisNumberArray.length = 0;
+    thisNumberArray.push(keyText);
+    updateDisplay(thisNumberArray, true);
+  }
+
+  if (keyText === "." && !thisNumberArray.includes(".")) {
+    if (thisNumberArray.length === 0) {
+      thisNumberArray.push("0");
     }
     thisNumberArray.push(keyText);
     updateDisplay(thisNumberArray, true);
   }
 
-  if (keyText === ".") {
-    thisNumberArray.push(keyText);
-    updateDisplay(thisNumberArray, true);
-  }
-
-  if (keyText === "±" && dirty) {
-    if (thisNumberArray[0] === "-") {
-      thisNumberArray.shift();
-      updateDisplay(thisNumberArray);
-    } else {
-      thisNumberArray.unshift("-");
-      updateDisplay(thisNumberArray);
+  if (keyText === "±") {
+    if(thisNumberArray.length !== 0) { //check wasn't pressed after operator
+      if (thisNumberArray[0] === "-") {
+        thisNumberArray.shift();
+        updateDisplay(thisNumberArray);
+      } else {
+        thisNumberArray.unshift("-");
+        updateDisplay(thisNumberArray);
+      }
     }
+
   } 
 
   if (keyText === "↰" && dirty) {
+    if (operator !== null && yArray.length === 0) {
+      return;
+    }
     thisNumberArray.pop();
     if (thisNumberArray.length === 0) {
       thisNumberArray.push("0")
@@ -117,7 +135,7 @@ function updateNumberArray(keyText, thisNumberArray, name) {
 }
 
 function updateDisplay(thisNumberArray, isDirty) {
-  let str = thisNumberArray.join("")
+  let str = thisNumberArray.slice(0,13).join("");
   console.log("string:" + str);
   display.innerText = str;
   dirty = isDirty ?? dirty;
