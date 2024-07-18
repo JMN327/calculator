@@ -1,8 +1,11 @@
 let xArray = [];
 let yArray = [];
-let operator = null;
-const display = document.querySelector(".display")
-const buttons = document.querySelector(".buttons")
+let operator;
+let dirty;
+const display = document.querySelector(".display");
+const buttons = document.querySelector(".buttons");
+
+initialize();
 
 buttons.addEventListener('click', (event) => {
   let keyText = event.target.innerText;
@@ -38,10 +41,19 @@ buttons.addEventListener('click', (event) => {
       evaluate(null);
       break;
     case "C":
-      clearAll()
+      initialize()
       break;
   }
 })
+
+function initialize(){
+  xArray.length = 0;
+  xArray[0] = "0";
+  yArray = [];
+  operator = null;
+  dirty = false;
+  updateDisplay(xArray, dirty);
+}
 
 function handleOperator(operatorFunction) {
   if (operator === null || yArray.length === 0) {
@@ -57,30 +69,48 @@ function evaluate(nextOperator) {
 }
 
 function updateNumberArray(keyText, thisNumberArray, name) {
-  console.log(`Adding ${keyText} to ${name}` )
-  if (keyText === "±") {
+  console.log(`${keyText} key pressed on: ${name}` )
+
+  // process numbers
+  if (!isNaN(keyText)) {
+    if (!dirty) {
+      thisNumberArray.pop();
+    }
+    thisNumberArray.push(keyText);
+    updateDisplay(thisNumberArray, true);
+  }
+
+  if (keyText === ".") {
+    thisNumberArray.push(keyText);
+    updateDisplay(thisNumberArray, true);
+  }
+
+  if (keyText === "±" && dirty) {
     if (thisNumberArray[0] === "−") {
       thisNumberArray.shift();
+      updateDisplay(thisNumberArray);
     } else {
       thisNumberArray.unshift("−");
+      updateDisplay(thisNumberArray);
     }
-  } else {
-    thisNumberArray.push(keyText);
+  } 
+
+  if (keyText === "↰" && dirty) {
+    thisNumberArray.pop();
+    if (thisNumberArray.length === 0) {
+      thisNumberArray.push("0")
+      dirty = false;
+    }
+    updateDisplay(thisNumberArray);
   }
-  
+}
+
+
+function updateDisplay(thisNumberArray, isDirty) {
   let str = thisNumberArray.join("")
-  updateDisplay(str);
-}
-
-function clearAll() {
-  xArray = [];
-  updateNumberArray("0", "x")
-  yArray = [];
-  operator = null;
-}
-
-function updateDisplay(str) {
-  display.innerText = str
+  console.log("string:" + str);
+  display.innerText = str;
+  dirty = isDirty ?? dirty;
 }
 
 function add(x,y) {
