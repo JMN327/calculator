@@ -47,9 +47,9 @@ buttons.addEventListener('click', (event) => {
 })
 
 function initialize(){
-  xArray.length = 0;
+  xArray.length = 0; //resets x array
   xArray[0] = "0";
-  yArray = [];
+  yArray.length = 0;  //resets the y array
   operator = null;
   dirty = false;
   updateDisplay(xArray, dirty);
@@ -57,21 +57,34 @@ function initialize(){
 
 function handleOperator(operatorFunction) {
   if (operator === null || yArray.length === 0) {
+    //normal setting operator or changing of operator if y value is still empty
     operator = operatorFunction;
   } else {
+    //if operator already exists and y has value, evaluates the function (same as
+    // pressing equals key) and passes new operator to be worked on the evaluation
+    // so that operations can be chained quickly
     evaluate(operatorFunction);
   }
 }
 
 function evaluate(nextOperator) {
   //do the evaluation and set x to answer
+  let x = arrayToNumber(xArray);
+  let y = arrayToNumber(yArray);
+  doOperation(x,y,operator);
   // if nextOperator !== null the set operator to it
+}
+
+function doOperation(x,y,operations)
+
+function arrayToNumber(array) {
+
 }
 
 function updateNumberArray(keyText, thisNumberArray, name) {
   console.log(`${keyText} key pressed on: ${name}` )
 
-  // process numbers
+  // process number keys
   if (!isNaN(keyText)) {
     if (!dirty) {
       thisNumberArray.pop();
@@ -104,7 +117,6 @@ function updateNumberArray(keyText, thisNumberArray, name) {
     updateDisplay(thisNumberArray);
   }
 }
-
 
 function updateDisplay(thisNumberArray, isDirty) {
   let str = thisNumberArray.join("")
