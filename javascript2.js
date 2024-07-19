@@ -3,12 +3,20 @@ const display = document.querySelector(".display-contents");
 const eDisplay = document.querySelector(".e");
 const operatorDisplay = document.querySelector(".operator");
 
+let state; //store the state
 let xArray = []; //store digits of first operand
 let yArray = []; //store digits of second operand
 let operator; //store the operator as a function
+let evaluated; //store is evaluation has taken place
 let precision = 11; //limit on digits that can be displayed
-let evaluated = false; //boolean to determine if evaluation has happened
 let keyFunction;
+let numberArrayToDisplay;
+let operatorToDisplay;
+let result;
+
+initialize();
+updateState();
+updateDisplay(numberArrayToDisplay);
 
 //check for keydown events
 document.addEventListener("keydown", (event) =>
@@ -19,8 +27,9 @@ buttons.addEventListener("click", (event) =>
   filterInput(event.target.innerText)
 );
 
-// direct keydown and button press events to correct input types
+// direct keydown and button press events to function handler
 function filterInput(keyText) {
+  console.log(`key ${keyText}`);
   switch (keyText) {
     case "0":
       keyFunction = fZero;
@@ -68,225 +77,331 @@ function filterInput(keyText) {
   fHandler(keyFunction, keyText);
 }
 
+// run key functions and update state and display
 function fHandler(keyFunction, keyText) {
   keyFunction(keyText);
-  //updateState();
-  //updateDisplay();
+  updateState();
+  updateDisplay(numberArrayToDisplay);
 }
 
+// Key functions - check state and update x, y or operator according to key functionality
 function fZero(keyText) {
   switch (state) {
-    case 0:
+    case 0: // x value is 0, operator is null, y length is 0, is not evaluated
+      //do nothing
       break;
 
-    case 1:
+    case 1: // x value is non-zero, operator is null, y length is 0, is not evaluated
+      if (xArray.length < precision) xArray.push(keyText);
+      numberArrayToDisplay = "x";
       break;
 
-    case 2:
+    case 2: // x value is non-zero, operator function is assigned, y length is 0, is not evaluated
+      if (yArray.length < precision) yArray.push(keyText);
+      numberArrayToDisplay = "y";
       break;
 
-    case 3:
+    case 3: // x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
+      if (arrayToFloat(yArray) !== 0 || yArray.length > 1) {
+        if (yArray.length < precision) yArray.push(keyText);
+        numberArrayToDisplay = "y";
+      }
       break;
 
-    case 4:
+    case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
+      initialize();
       break;
 
-    default:
+    default: // error
       break;
   }
 }
 function fNumber(keyText) {
   switch (state) {
-    case 0:
+    case 0: // x value is 0, operator is null, y length is 0, is not evaluated
+      xArray.push(keyText);
+      xArray.shift();
+      numberArrayToDisplay = "x";
       break;
 
-    case 1:
+    case 1: // x value is non-zero, operator is null, y length is 0, is not evaluated
+      if (xArray.length < precision) xArray.push(keyText);
+      numberArrayToDisplay = "x";
       break;
 
-    case 2:
+    case 2: // x value is non-zero, operator function is assigned, y length is 0, is not evaluated
+      yArray.push(keyText);
+      numberArrayToDisplay = "y";
       break;
 
-    case 3:
+    case 3: // x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
+      if (yArray.length < precision) yArray.push(keyText);
+      numberArrayToDisplay = "y";
       break;
 
-    case 4:
+    case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
+      initialize();
+      xArray.push(keyText);
+      xArray.shift();
+      numberArrayToDisplay = "x";
       break;
 
-    default:
+    default: // error
       break;
   }
 }
-
 function fBackspace(keyText) {
   switch (state) {
-    case 0:
+    case 0: // x value is 0, operator is null, y length is 0, is not evaluated
+      // do nothing
       break;
 
-    case 1:
+    case 1: // x value is non-zero, operator is null, y length is 0, is not evaluated
+      xArray.pop();
+      if (xArray.length === 0) {
+        xArray.push("0");
+        numberArrayToDisplay = "x";
+      }
       break;
 
-    case 2:
+    case 2: // x value is non-zero, operator function is assigned, y length is 0, is not evaluated
+      // do nothing
       break;
 
-    case 3:
+    case 3: // x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
+      yArray.pop();
+      if (yArray.length === 0) {
+        yArray.push("0");
+        numberArrayToDisplay = "y";
+      }
       break;
 
-    case 4:
+    case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
+      // do nothing
       break;
 
-    default:
+    default: // error
       break;
   }
 }
-
 function fDecimal(keyText) {
   switch (state) {
-    case 0:
+    case 0: // x value is 0, operator is null, y length is 0, is not evaluated
+      xArray.push(keyText);
+      numberArrayToDisplay = "x";
       break;
 
-    case 1:
+    case 1: // x value is non-zero, operator is null, y length is 0, is not evaluated
+      if (!xArray.includes(keyText)) {
+        if (xArray.length < precision) xArray.push(keyText);
+        numberArrayToDisplay = "x";
+      }
       break;
 
-    case 2:
+    case 2: // x value is non-zero, operator function is assigned, y length is 0, is not evaluated
+      yArray.push("0");
+      yArray.push(keyText);
+      numberArrayToDisplay = "y";
       break;
 
-    case 3:
+    case 3: // x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
+      if (!yArray.includes(keyText)) {
+        if (yArray.length < precision) yArray.push(keyText);
+        numberArrayToDisplay = "y";
+      }
       break;
 
-    case 4:
+    case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
+      initialize();
+      xArray.push(keyText);
+      numberArrayToDisplay = "x";
       break;
 
-    default:
+    default: // error
       break;
   }
 }
-
 function fNegate(keyText) {
   switch (state) {
-    case 0:
+    case 0: // x value is 0, operator is null, y length is 0, is not evaluated
+      // do nothing
       break;
 
-    case 1:
+    case 1: // x value is non-zero, operator is null, y length is 0, is not evaluated
+      if (xArray[0] === "-") {
+        xArray.shift();
+      } else {
+        xArray.unshift("-");
+      }
       break;
 
-    case 2:
+    case 2: // x value is non-zero, operator function is assigned, y length is 0, is not evaluated
+      // do nothing
       break;
 
-    case 3:
+    case 3: // x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
+      if (yArray[0] !== "0" || yArray.length > 1) {
+        if (yArray[0] === "-") {
+          yArray.shift();
+        } else {
+          yArray.unshift("-");
+        }
+      }
       break;
 
-    case 4:
+    case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
+      // do nothing
       break;
 
-    default:
+    default: // error
       break;
   }
 }
-
 function fOperate(keyText) {
+  switch (keyText) {
+    case "+":
+      possibleOperator = add;
+      operatorToDisplay = "+";
+      break;
+
+    case "-":
+    case "−":
+      possibleOperator = subtract;
+      operatorToDisplay = "−";
+      break;
+    case "×":
+      possibleOperator = multiply;
+      operatorToDisplay = "×";
+      break;
+    case "/":
+    case "÷":
+      possibleOperator = divide;
+      operatorToDisplay = "÷";
+      break;
+  }
   switch (state) {
-    case 0:
+    case 0: // x value is 0, operator is null, y length is 0, is not evaluated
+      operator = possibleOperator;
       break;
 
-    case 1:
+    case 1: // x value is non-zero, operator is null, y length is 0, is not evaluated
+      operator = possibleOperator;
       break;
 
-    case 2:
+    case 2: // x value is non-zero, operator function is assigned, y length is 0, is not evaluated
+      operator = possibleOperator;
       break;
 
-    case 3:
+    case 3: // x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
+      let result = evaluate();
+      xArray = result;
+      operator = possibleOperator;
+      yArray.length = 0;
       break;
 
-    case 4:
+    case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
+      xArray = result;
+      operator = possibleOperator;
+      yArray.length = 0;
+      evaluated = false;
       break;
 
-    default:
+    default: // error
       break;
   }
 }
-
 function fEquals(keyText) {
+  operatorToDisplay = ""
+  let result;
   switch (state) {
-    case 0:
+    case 0: // x value is 0, operator is null, y length is 0, is not evaluated
+      // do nothing
       break;
 
-    case 1:
+    case 1: // x value is non-zero, operator is null, y length is 0, is not evaluated
+      // do nothing
       break;
 
-    case 2:
+    case 2: // x value is non-zero, operator function is assigned, y length is 0, is not evaluated
+      yArray = xArray;
+      result = evaluate();
+      xArray = result;
+
       break;
 
-    case 3:
+    case 3: // x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
+      result = evaluate();
+      xArray = result;
       break;
 
-    case 4:
+    case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
+      result = evaluate();
+      xArray = result;
       break;
 
-    default:
+    default: // error
       break;
   }
 }
+function fClear() {
+  initialize();
+}
 
-function fClear(keyText) {
-  switch (state) {
-    case 0:
-      break;
-
-    case 1:
-      break;
-
-    case 2:
-      break;
-
-    case 3:
-      break;
-
-    case 4:
-      break;
-
-    default:
-      break;
+// x operates on y returns result
+function evaluate() {
+  evaluated = true;
+  let x = parseFloat(xArray.join(""));
+  let y = parseFloat(yArray.join(""));
+  result = parseFloat(operator(x, y).toPrecision(precision + 1));
+  result = String(result).split("");
+  if (result.length > precision) {
+    e = true;
+  } else {
+    e = false;
   }
+  numberArrayToDisplay = "x";
+  return result;
+  
 }
 
 // check state values and return state enumerator
 function updateState() {
-  // 0. x value is 0, operator is null, y length is 0
-  // 1. x value is non-zero, operator is null, y length is 0
-  // 2. x value is non-zero, operator function is assigned, y length is 0
+  // 0. x value is 0, operator is null, y length is 0, is not evaluated
+  // 1. x value is non-zero, operator is null, y length is 0, is not evaluated
+  // 2. x value is non-zero, operator function is assigned, y length is 0, is not evaluated
   // 3. x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
   // 4. x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
-  let state;
   switch (true) {
-    case xArray[0] === 0 &&
+    case xArray[0] === "0" &&
+      xArray.length === 1 &&
       operator === null &&
       yArray.length === 0 &&
       evaluated === false:
       state = 0;
       break;
 
-    case arrayToFloat(xArray) !== 0 &&
+    case (xArray[0] !== "0" || xArray.length > 1) &&
       operator === null &&
       yArray.length === 0 &&
       evaluated === false:
       state = 1;
       break;
 
-    case arrayToFloat(xArray) !== 0 &&
+    case (xArray[0] !== "0" || xArray.length > 1) &&
       operator !== null &&
       yArray.length === 0 &&
       evaluated === false:
       state = 2;
       break;
 
-    case arrayToFloat(xArray) !== 0 &&
+    case (xArray[0] !== "0" || xArray.length > 1) &&
       operator !== null &&
       yArray.length !== 0 &&
       evaluated === false:
       state = 3;
       break;
 
-    case arrayToFloat(xArray) !== 0 &&
+    case (xArray[0] !== "0" || xArray.length > 1) &&
       operator !== null &&
       yArray.length !== 0 &&
       evaluated === true:
@@ -298,20 +413,25 @@ function updateState() {
       alert("State Error");
       break;
   }
-
-  return state;
+  console.log(state);
 }
 
 // change visuals on webpage
-function updateDisplay(nArray, e, operator) {
+function updateDisplay(numberArrayToDisplay) {
+  if (numberArrayToDisplay === "x") {
+    nArray = xArray;
+  } else {
+    nArray = yArray;
+  }
   let str = nArray.slice(0, precision).join("");
+  console.log(`string: ${str}`);
   display.innerText = str;
   if (e) {
     eDisplay.innerText = "e";
   } else {
     eDisplay.innerText = "";
   }
-  operatorDisplay.innerText = operator;
+  operatorDisplay.innerText = operatorToDisplay;
 }
 
 // utilities:
@@ -320,7 +440,10 @@ function initialize() {
   xArray[0] = "0";
   yArray.length = 0; //resets the y array
   operator = null;
+  e = false;
+  operatorToDisplay = "";
   evaluated = false;
+  numberArrayToDisplay = "x";
 }
 
 function arrayToFloat(nArray) {
