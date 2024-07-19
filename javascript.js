@@ -61,6 +61,7 @@ function filterInput(keyText) {
     case "+":
     case "-":
     case "−":
+    case "*":
     case "×":
     case "/":
     case "÷":
@@ -276,6 +277,7 @@ function fOperate(keyText) {
       possibleOperator = subtract;
       operatorToDisplay = "−";
       break;
+    case "*":
     case "×":
       possibleOperator = multiply;
       operatorToDisplay = "×";
