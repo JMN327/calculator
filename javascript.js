@@ -144,7 +144,6 @@ function fNumber(keyText) {
     case 3: // x value is non-zero, operator function is assigned, y length is non-zero, is not evaluated
       if (yArray.length === 1 && yArray[0] === "0") {
         yArray.pop();
-        yArray.push(keyText);
       }
       if (yArray.length < precision) yArray.push(keyText);
       numberArrayToDisplay = "y";
