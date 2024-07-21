@@ -224,6 +224,7 @@ function fDecimal(keyText) {
     case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
       initialize();
       xArray.push(keyText);
+      dirty = true;
       numberArrayToDisplay = "x";
       break;
 
