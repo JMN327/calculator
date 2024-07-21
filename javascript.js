@@ -1,8 +1,8 @@
 // get HTML elements
 const buttons = document.querySelector(".buttons");
 const display = document.querySelector(".display-contents");
-const eDisplay = document.querySelector(".e");
-const operatorDisplay = document.querySelector(".operator");
+const eDisplay = document.querySelector(".display-e");
+const operatorDisplay = document.querySelector(".display-operator");
 
 let state; // store the state
 let dirty = false; // boolean check that work has begun
