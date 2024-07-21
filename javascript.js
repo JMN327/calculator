@@ -169,8 +169,7 @@ function fBackspace(keyText) {
     case 1: // x value is non-zero, operator is null, y length is 0, is not evaluated
       xArray.pop();
       if (xArray.length === 0) {
-        xArray.push("0");
-        numberArrayToDisplay = "x";
+        initialize();
       }
       break;
 
