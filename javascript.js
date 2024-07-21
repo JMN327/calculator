@@ -126,7 +126,7 @@ function fNumber(keyText) {
   switch (state) {
     case 0: // x value is 0, operator is null, y length is 0, is not evaluated
       xArray.push(keyText);
-      xArray.shift();
+      if (xArray[0] === "0") xArray.shift();
       numberArrayToDisplay = "x";
       dirty = true;
       break;
@@ -151,8 +151,8 @@ function fNumber(keyText) {
 
     case 4: // x value is non-zero, operator function is assigned, y length is non-zero, is evaluated
       initialize();
-      xArray.push(keyText);
       xArray.shift();
+      xArray.push(keyText);
       numberArrayToDisplay = "x";
       break;
 
