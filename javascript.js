@@ -10,7 +10,7 @@ let xArray = []; // store digits of first operand
 let yArray = []; // store digits of second operand
 let operator; // store the operator as a function
 let evaluated; // store is evaluation has taken place
-let precision = 11; // limit on digits that can be displayed
+let precision = 10; // limit on digits that can be displayed
 let keyFunction;
 let numberArrayToDisplay;
 let operatorToDisplay;
