@@ -76,7 +76,7 @@ button:active {
     background-image: linear-gradient(rgb(235, 248, 255), white,rgb(232, 241, 245),rgb(235, 249, 255), rgb(202, 211, 218));
     color: rgba(36, 30, 37, 0.719);
     font-family:Arial, Helvetica, sans-serif;
-    text-shadow: 1px 2px 1.3px rgb(255, 255, 255),
+    text-shadow: 1px 2px 2.5px rgb(255, 255, 255),
      1px 2px 5px rgb(58, 99, 100);
      font-weight: 700;   
 }
